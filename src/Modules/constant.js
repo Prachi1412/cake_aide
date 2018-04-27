@@ -50,6 +50,10 @@ define(exports.responseMessages, 'EQUIPMENT_NOT_EXISTS',             	  'Equipme
 define(exports.responseMessages, 'OTP_SENT',             	 			  'OTP Send to your mail id');
 define(exports.responseMessages, 'LOGOUT_SUCCESSFULLY',                   'Logout successfully.');
 define(exports.responseMessages, 'RECIPE_NOT_EXISTS',             	      'Recipe not Exist');
+define(exports.responseMessages, 'RECIPE_ALREADY_EXISTS',                 'Recipe already Exist');
+define(exports.responseMessages, 'IMAGE_UPLOADED',                        'Image Uploaded successfully');
+define(exports.responseMessages, 'RECIPE_UPLOADED',                       'Paste Recipe successfully');
+define(exports.responseMessages, 'MANUAL_ENTRY_LIST',                     'Manual Ingredient added successfully');
 //FOR FLAGS
 define(exports.responseFlags, 'ALREADY_EXIST',                       422);
 define(exports.responseFlags, 'PARAMETER_MISSING',                   422);
@@ -82,6 +86,10 @@ define(exports.responseFlags, 'EQUIPMENT_NOT_EXISTS',           	 403);
 define(exports.responseFlags, 'OTP_SENT',           				 200);
 define(exports.responseFlags, 'LOGOUT_SUCCESSFULLY',           	     200);
 define(exports.responseFlags, 'RECIPE_NOT_EXISTS',           	     403);
+define(exports.responseFlags, 'Recipe_ALREADY_EXISTS',               403);
+define(exports.responseFlags, 'IMAGE_UPLOADED',                      200);
+define(exports.responseFlags, 'RECIPE_UPLOADED',                     200);
+define(exports.responseFlags, 'MANUAL_ENTRY_LIST',                   200);
 
 
 

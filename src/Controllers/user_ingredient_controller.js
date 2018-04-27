@@ -78,7 +78,7 @@ exports.deleteIngredient = (req ,res) => {
 };
 	
 exports.get_ingredient = (req , res) => {
-	let sql = "select `ingredient_name` from `tb_ingredientlist";
+	let sql = "select `ingredient_name` from `tb_ingredientlist`";
 	connection.query(sql , [] ,function(err , result) {
 		if(err) {
 			responses.sendError(err,res);
