@@ -1,9 +1,0 @@
-{
-	"projectName": "cake_aide",
-	"base_url": "http://localhost:3017/",
-	"SMTP_HOST": "smtp.sendgrid.net",
-    "SMTP_PORT": 25,
-    "SMTP_USER": "apikey",
-    "SMTP_PASS":  "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"
-
-}
