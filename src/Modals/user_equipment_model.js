@@ -35,7 +35,7 @@ let insertQuery = (values) => {
 			else {
 				// message.sendOtp
 				// email.sendMail
-				let sql = "SELECT * FROM `tb_equipmentlist`";
+				let sql = "SELECT * FROM `tb_equipmentlist` ORDER BY `row_id` DESC";
 				connection.query(sql, [], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});

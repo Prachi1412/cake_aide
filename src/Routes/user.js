@@ -21,6 +21,7 @@ exports.getRouter = (app) => {
 	app.route("/user/forgotPassword").post(user.forgotPassword);
 	app.route("/user/resetPassword").post(auth.requiresLogin, user.resetPassword);
 	app.route("/user/createProfile").post(auth.requiresLogin,upload.any(), user.createProfile);
+	app.route("/user/updateProfile").post(auth.requiresLogin,upload.any(), user.updateProfile);
 	app.route("/user/verifyOtp").post(auth.requiresLogin, user.verifyOtp);
 	app.route("/user/logOut").post(auth.requiresLogin,user.logOut);
 	return app;

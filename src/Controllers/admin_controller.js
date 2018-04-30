@@ -12,7 +12,7 @@ exports.login = (req, res) => {
 	let condition  = {email}
 	let encrypt_password = md5(password);
 	let access_token = md5(new Date());
-	let updateData = {access_token};
+	let updateData = {access_token , verification_code:""};
 	
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
@@ -31,11 +31,34 @@ exports.login = (req, res) => {
 	})
 	.catch((error) => responses.sendError(error.message, res));
 };
+// exports.forgotPassword = (req , res) => {
+// 	let {email} = req.body;
+// 	let manKeys = ["email"];
+// 	let condition = {email};
+// 	let verification_code = commFunc.generateRandomString();
+// 	let updateData = {verification_code};
+// 	commFunc.checkKeyExist(req.body, manKeys)
+// 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
+// 	.then(result => {
+// 		AdminModel.selectQuery(condition)
+// 		.then(adminResult => adminResult[0].email != req.body.email ? responses.invalidCredential(res , constant.responseMessages.EMAIL_NOT_FOUND) : adminResult)
+// 		.then(adminResult =>{
+// 			let admin_id = adminResult[0].admin_id;
+// 			let condition = {admin_id};
+// 			AdminModel.updateQuery(updateData , condition)
+// 			.then((adminResponse) => { responses.success(res , adminResponse)
+// 				config.adminSendMail(verification_code , email);
+// 			})
+// 			.catch((error) => responses.sendError(error.message, res));
+// 		})
+// 		.catch((error) => responses.sendError(error.message, res));
+// 	})
+// 	.catch((error) => responses.sendError(error.message, res));
+// };
 exports.forgotPassword = (req , res) => {
 	let {email} = req.body;
 	let manKeys = ["email"];
 	let condition = {email};
-	let verification_code = commFunc.generateRandomString();
 	let updateData = {verification_code};
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
@@ -47,7 +70,7 @@ exports.forgotPassword = (req , res) => {
 			let condition = {admin_id};
 			AdminModel.updateQuery(updateData , condition)
 			.then((adminResponse) => { responses.success(res , adminResponse)
-				config.sendMail(verification_code , email);
+				config.adminSendMail(email);
 			})
 			.catch((error) => responses.sendError(error.message, res));
 		})

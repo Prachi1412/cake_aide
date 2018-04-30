@@ -29,7 +29,7 @@ exports.requiresLoginAdmin = (req, res, next) => {
             } else if (result.length == 0) {
                 next(responses.authenticationErrorResponse(res));
             } else {
-                req.user = result[0];
+                req.admin = result[0];
                 next();
             }
         });
