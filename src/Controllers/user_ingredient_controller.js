@@ -10,48 +10,49 @@ import md5 from 'md5';
 exports.addIngredient = (req , res) => {
 	let { ingredient_name , brand , price ,currency, quantity ,size } = req.body;
 	let {access_token} = req.headers;
+	let user_id = req.user.user_id;
 	let manKeys = ["ingredient_name" , "brand" , "price" ,"currency" , "quantity" , "size"];
-	let condition = {access_token};
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
 	.then(result => {
-		UserModel.selectQuery(condition)
-		.then(userResult => userResult.length < 0 ? responses.userNotExist(res) : userResult )
-		.then((userResult) =>{
 			IngredientModel.selectQuery({ingredient_name})
-			.then(ingredientResult => ingredientResult.length >0 ? new Promise(new Error(responses.invalidCredential(res, constant.responseMessages.INGREDIENT_ALREADY_EXISTS))):ingredientResult)
-			.then((ingredientResult) => {
-				let user_id = userResult[0].user_id;
-				let condition = {user_id};
-				let ingredient_id = md5(new Date());
-				let insertData = {user_id ,ingredient_id,ingredient_name , brand , price ,currency , quantity ,size}
-				IngredientModel.insertQuery(insertData).then((ingredientResponse) =>{ responses.success(res, ingredientResponse)})
-				.catch((error) => responses.sendError(error.message, res));
+			.then(ingredientResult => {
+				if(ingredientResult.length >0) {
+					responses.invalidCredential(res, constant.responseMessages.INGREDIENT_ALREADY_EXISTS);
+				} else {
+					let ingredient_id = md5(new Date());
+					let insertData = {user_id ,ingredient_id,ingredient_name , brand , price ,currency , quantity ,size}
+					IngredientModel.insertQuery(insertData).then((ingredientResponse) =>{ responses.success(res, ingredientResponse[0])})
+					.catch((error) => responses.sendError(error.message, res));
+				}
 			}) .catch((error) => responses.sendError(error.message, res));
 
 		}).catch((error) => responses.sendError(error.message, res));
-	}).catch((error) => responses.sendError(error.message, res));
 };
 
 exports.editIngredient = (req ,res) => {
 	let {ingredient_id,ingredient_name , brand , price ,currency, quantity , size} = req.body;
 	let {access_token} = req.headers;
-	let manKeys = ["ingredient_id","ingredient_name" , "brand" , "price" ,"currency" , "quantity" , "size"];
+	let manKeys = ["ingredient_id"];
 	let condition = {access_token};
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
 	.then(result => {
 		IngredientModel.selectQuery({ingredient_id})
-		.then(ingredientResult => ingredientResult.length > 0 ? ingredientResult : responses.ingredientNotExist(res))
-		.then((ingredientResult) => { 
-			console.log(ingredientResult)
-			let updateData = { ingredient_name , brand , price ,currency, quantity , size};
-			let ingredient_id = ingredientResult[0].ingredient_id;
-			let condition = {ingredient_id};
-			IngredientModel.updateQuery(updateData , condition)
-			.then((ingredientResponse) =>{ responses.success(res, ingredientResponse)})
-			.catch((error) => responses.sendError(error.message, res));
-		}) .catch((error) => responses.sendError(error.message, res));
+		.then(ingredientResult => {
+			if(ingredientResult.length > 0){
+				console.log(ingredientResult)
+				let updateData = req.body;
+				let ingredient_id = ingredientResult[0].ingredient_id;
+				let condition = {ingredient_id};
+				IngredientModel.updateQuery(updateData , condition)
+				.then((ingredientResponse) =>{ responses.success(res, ingredientResponse)})
+				.catch((error) => responses.sendError(error.message, res));
+			} else {
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS)
+			}
+		} ) .catch((error) => responses.sendError(error.message, res));
+
 
 	}).catch((error) => responses.sendError(error.message, res));
 
@@ -63,18 +64,19 @@ exports.deleteIngredient = (req ,res) => {
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
 	.then(result => {
 		IngredientModel.selectQuery({ingredient_id})
-		.then(ingredientResult => ingredientResult.length > 0 ? ingredientResult : responses.invalidCredential(res , constant.responseMessages.INGREDIENT_NOT_EXISTS))
-		.then((ingredientResult) => { 
-			let ingredient_id = ingredientResult[0].ingredient_id;
-			let condition = {ingredient_id};
-			IngredientModel.deleteQuery(condition)
-			.then((ingredientResponse) =>{ 
-				responses.success(res , constant.responseMessages.INGREDIENT_DELETED_SUCCESSFULLY)})
-			.catch((error) => responses.sendError(error.message, res));
+		.then(ingredientResult => {
+			if(ingredientResult.length > 0) {
+				let ingredient_id = ingredientResult[0].ingredient_id;
+		    	let condition = {ingredient_id};
+			    IngredientModel.deleteQuery(condition)
+			    .then((ingredientResponse) =>{ 
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_DELETED_SUCCESSFULLY)})
+			   .catch((error) => responses.sendError(error.message, res));
+			} else {
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS);
+			}
 		}) .catch((error) => responses.sendError(error.message, res));
-
-	}).catch((error) => responses.sendError(error.message, res));
-
+	}) .catch((error) => responses.sendError(error.message, res));
 };
 exports.get_ingredient = (req , res) => {
 	let sql = "select `ingredient_name` from `tb_ingredientlist`";
@@ -86,7 +88,6 @@ exports.get_ingredient = (req , res) => {
 		}
 	})
 }
-
 	
 
 

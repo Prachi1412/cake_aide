@@ -13,52 +13,30 @@ exports.login = (req, res) => {
 	let encrypt_password = md5(password);
 	let access_token = md5(new Date());
 	let updateData = {access_token , verification_code:""};
-	
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
 	.then(result => {
 		AdminModel.selectQuery(condition)
-		.then(adminResult=> adminResult.length == 0 ? responses.invalidCredential(res, constant.responseMessages.INVALID_EMAIL_ID) : adminResult)
-		.then(adminResult=> adminResult[0].password != encrypt_password ? responses.invalidCredential(res, constant.responseMessages.INCORRECT_PASSWORD) : adminResult)
 		.then(adminResult=> {
-			let admin_id = adminResult[0].admin_id;
-			let condition = {admin_id}
-			AdminModel.updateQuery(updateData, condition)
-			.then((adminResponse) =>{ responses.success(res, adminResponse)})
-			.catch((error) => responses.sendError(error.message, res));
-		})
-		.catch((error) => responses.sendError(error.message, res));
-	})
-	.catch((error) => responses.sendError(error.message, res));
+			if(adminResult.length == 0) {
+				responses.invalidCredential(res, constant.responseMessages.INVALID_EMAIL_ID);
+			}else if(adminResult[0].password != encrypt_password) {
+				responses.invalidCredential(res, constant.responseMessages.INCORRECT_PASSWORD);
+			} else {
+				let admin_id = adminResult[0].admin_id;
+				let condition = {admin_id}
+				AdminModel.updateQuery(updateData, condition)
+				.then((adminResponse) =>{ responses.success(res, adminResponse)})
+				.catch((error) => responses.sendError(error.message, res));
+			}
+		}).catch((error) => responses.sendError(error.message, res));
+	}).catch((error) => responses.sendError(error.message, res));
 };
-// exports.forgotPassword = (req , res) => {
-// 	let {email} = req.body;
-// 	let manKeys = ["email"];
-// 	let condition = {email};
-// 	let verification_code = commFunc.generateRandomString();
-// 	let updateData = {verification_code};
-// 	commFunc.checkKeyExist(req.body, manKeys)
-// 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
-// 	.then(result => {
-// 		AdminModel.selectQuery(condition)
-// 		.then(adminResult => adminResult[0].email != req.body.email ? responses.invalidCredential(res , constant.responseMessages.EMAIL_NOT_FOUND) : adminResult)
-// 		.then(adminResult =>{
-// 			let admin_id = adminResult[0].admin_id;
-// 			let condition = {admin_id};
-// 			AdminModel.updateQuery(updateData , condition)
-// 			.then((adminResponse) => { responses.success(res , adminResponse)
-// 				config.adminSendMail(verification_code , email);
-// 			})
-// 			.catch((error) => responses.sendError(error.message, res));
-// 		})
-// 		.catch((error) => responses.sendError(error.message, res));
-// 	})
-// 	.catch((error) => responses.sendError(error.message, res));
-// };
 exports.forgotPassword = (req , res) => {
 	let {email} = req.body;
 	let manKeys = ["email"];
 	let condition = {email};
+	let verification_code = commFunc.generateRandomString();
 	let updateData = {verification_code};
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? responses.parameterMissing(res, result[0]) : '')
@@ -69,8 +47,8 @@ exports.forgotPassword = (req , res) => {
 			let admin_id = adminResult[0].admin_id;
 			let condition = {admin_id};
 			AdminModel.updateQuery(updateData , condition)
-			.then((adminResponse) => { responses.success(res , adminResponse)
-				config.adminSendMail(email);
+			.then((adminResponse) => { responses.successOtp(res , constant.responseMessages.OTP_SENT)
+				config.sendMail(verification_code , email);
 			})
 			.catch((error) => responses.sendError(error.message, res));
 		})
@@ -112,7 +90,7 @@ exports.resetPassword = (req , res) => {
 	.then(result => result.length ? responses.parameterMissing(res , result[0]) : '')
 	.then(result => {
 		if(new_password.length < 8) {
-			responses.invalidpasswordformat(res);
+			responses.invalidCredential(res , constant.responseMessages.INVALID_PASSWORD_FORMAT);
 		} else {
 		AdminModel.selectQuery(condition)
 		.then(adminResult => adminResult[0].verification_code != req.body.verification_code ? responses.invalidCredential(res ,constant.responseMessages.OTP_NOT_MATCHED) : adminResult )
@@ -128,6 +106,7 @@ exports.resetPassword = (req , res) => {
 	})
 	.catch((error) => responses.sendError(error.message, res));
 };
+
 exports.logOut = (req, res) => {
 	let {access_token} = req.headers;
 	let condition = {access_token};

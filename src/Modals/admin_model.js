@@ -5,7 +5,6 @@ import config from '../Config/nodemailer.js';
 
 let selectQuery = (values) => {
 	return new Promise((resolve, reject) => { 
-		console.log(values)
 		let sql = "SELECT * FROM `tb_admin` WHERE ?";
 		connection.query(sql, [values], (err, result) => {
 			err ? reject(err) : resolve(result);

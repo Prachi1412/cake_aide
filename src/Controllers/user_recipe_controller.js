@@ -38,7 +38,7 @@ exports.createRecipeType = (req , res) => {
 				.then((userResult) => {
 				let user_id = userResult[0].user_id;
 				let recipe_id = md5(new Date());
-				let insertData = {user_id ,recipe_id ,paste_recipe , recipe_type : 2}
+				let insertData = {user_id ,recipe_id ,paste_recipe ,is_recipe_pasted:1, recipe_type : 2}
 				RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success(res, constant.responseMessages.RECIPE_UPLOADED)})
 				.catch((error) => responses.sendError(error.message, res));
 		    }).catch((error) => responses.sendError(error.message, res));
@@ -75,7 +75,7 @@ exports.newRecipeEntry = (req , res) => {
 	    let condition = {recipe_id};
 		let updateData = {recipe_name,cake_size,need_quantity,price};
 		RecipeModel.updateQuery(updateData , condition)
-		.then(recipeResponse => responses.success(res , recipeResponse))
+		.then(recipeResponse => responses.success(res , recipeResponse[0]))
 		.catch((error) => responses.sendError(error.message, res));
 	}).catch((error) => responses.sendError(error.message, res));
 }

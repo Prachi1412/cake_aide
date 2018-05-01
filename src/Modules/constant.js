@@ -56,6 +56,8 @@ define(exports.responseMessages, 'RECIPE_UPLOADED',                       'Paste
 define(exports.responseMessages, 'MANUAL_ENTRY_LIST',                     'Manual Ingredient added successfully');
 define(exports.responseMessages, 'NAME_ALREADY_EXISTS',                   'This name already Exist');
 define(exports.responseMessages, 'OTP_VERIFIED',                           'Otp verified : 1');
+define(exports.responseMessages, 'QUOTECALCULATOR_NOT_EXISTS',             'Quote Calculator not Exist');
+define(exports.responseMessages, 'QUOTECALCULATOR_DELETED_SUCCESSFULLY',   'Quote Calculator deleted successfully.');
 //FOR FLAGS
 define(exports.responseFlags, 'ALREADY_EXIST',                       422);
 define(exports.responseFlags, 'PARAMETER_MISSING',                   422);
@@ -94,7 +96,8 @@ define(exports.responseFlags, 'RECIPE_UPLOADED',                     200);
 define(exports.responseFlags, 'MANUAL_ENTRY_LIST',                   200);
 define(exports.responseFlags, 'NAME_ALREADY_EXISTS',                 403);
 define(exports.responseFlags, 'OTP_VERIFIED',                        200);
-
+define(exports.responseFlags, 'QUOTECALCULATOR_NOT_EXISTS',          403);
+define(exports.responseFlags, 'QUOTECALCULATOR_DELETED_SUCCESSFULLY', 200);
 
 
 

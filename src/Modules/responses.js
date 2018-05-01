@@ -62,6 +62,13 @@ exports.success = (res, result) => {
 	};
 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
 };
+exports.successOtp = (res, result) => {
+	var response = {
+		"message": result,
+		
+	};
+	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+};
 
 exports.userNotExist = (res) => {
 	var response = {
