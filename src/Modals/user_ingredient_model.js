@@ -6,7 +6,6 @@ import constant from '../Modules/constant';
 let selectQuery = (values) => {
 	console.log(values)
 	return new Promise((resolve, reject) => { 
-		console.log('userid'+values)
 		let sql = "SELECT * FROM `tb_ingredientlist` WHERE ?";
 		connection.query(sql, [values], (err, result) => {
 			err ? reject(err) : resolve(result);
@@ -36,8 +35,8 @@ let insertQuery = (values) => {
 			else {
 				// message.sendOtp
 				// email.sendMail
-				let sql = "SELECT * FROM `tb_ingredientlist`";
-				connection.query(sql, [], (err, result) => {
+				let sql = "SELECT * FROM `tb_ingredientlist` WHERE ingredient_id = ?";
+				connection.query(sql, [values.ingredient_id], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
 			}

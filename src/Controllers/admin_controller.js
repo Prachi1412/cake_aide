@@ -2,7 +2,7 @@ import commFunc from '../Modules/commonFunction';
 import responses from '../Modules/responses';
 import constant from '../Modules/constant';
 import AdminModel from '../Modals/admin_model';
-import config from '../Config/nodemailer.js';
+import config from '../Config/nodemailer';
 
 import md5 from 'md5';
 
@@ -82,7 +82,7 @@ exports.verifyOtp = (req , res) => {
 exports.resetPassword = (req , res) => {
 	let {new_password , verification_code} = req.body;
 	let {access_token} = req.headers;
-	let manKeys = ["new_password","verification_code"];
+	let manKeys = ["new_password"];
 	let condition = {access_token};
 	let password = md5(new_password);
 	let updateData = {password , verification_code : "" ,is_otp_verified : 0};
@@ -93,12 +93,11 @@ exports.resetPassword = (req , res) => {
 			responses.invalidCredential(res , constant.responseMessages.INVALID_PASSWORD_FORMAT);
 		} else {
 		AdminModel.selectQuery(condition)
-		.then(adminResult => adminResult[0].verification_code != req.body.verification_code ? responses.invalidCredential(res ,constant.responseMessages.OTP_NOT_MATCHED) : adminResult )
-		.then(adminResult => {
+			.then(adminResult => {
 			let admin_id = adminResult[0].admin_id;
 			let condition = {admin_id};
 			AdminModel.updateQuery(updateData , condition)
-			.then((adminResponse) => {responses.success(res ,adminResponse);})
+			.then((adminResponse) => {responses.success(res ,constant.responseMessages.RESETPASSWORD_SUCCESSFULLY);})
 			.catch((error) => responses.sendError(error.message, res));
 		})
 		.catch((error) => responses.sendError(error.message, res));

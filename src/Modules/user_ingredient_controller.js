@@ -7,7 +7,6 @@ import connection from '../Modules/connection.js';
 
 import md5 from 'md5';
 
-
 exports.addIngredient = (req , res) => {
 	let { ingredient_name , brand , price ,currency, quantity ,size } = req.body;
 	let {access_token} = req.headers;
@@ -19,21 +18,10 @@ exports.addIngredient = (req , res) => {
 			IngredientModel.selectQuery({ingredient_name})
 			.then(ingredientResult => {
 				if(ingredientResult.length >0) {
-					throw new Error(responses.invalidCredential(res, constant.responseMessages.INGREDIENT_ALREADY_EXISTS));
+					responses.invalidCredential(res, constant.responseMessages.INGREDIENT_ALREADY_EXISTS);
 				} else {
 					let ingredient_id = md5(new Date());
-					if(currency == 1) {
-						currency = "£";
-					} else if(currency == 2) {
-						currency = "$";
-					} else if(currency == 3) {
-						currency = "€";
-					} else if(currency == 4) {
-						currency = "¥";
-					} else {
-						throw new Error(responses.invalidCredential(res , 'Plaese enter right currency parameter'));
-					}
-					let insertData = {user_id ,ingredient_id,ingredient_name , brand , price ,currency : currency , quantity ,size}
+					let insertData = {user_id ,ingredient_id,ingredient_name , brand , price ,currency , quantity ,size}
 					IngredientModel.insertQuery(insertData).then((ingredientResponse) =>{ responses.success(res, ingredientResponse[0])})
 					.catch((error) => responses.sendError(error.message, res));
 				}
@@ -54,25 +42,14 @@ exports.editIngredient = (req ,res) => {
 		.then(ingredientResult => {
 			if(ingredientResult.length > 0){
 				console.log(ingredientResult)
-				if(currency == 1) {
-						currency = "£";
-					} else if(currency == 2) {
-						currency = "$";
-					} else if(currency == 3) {
-						currency = "€";
-					} else if(currency == 4) {
-						currency = "¥";
-					} else {
-						throw new Error(responses.invalidCredential(res , 'Plaese enter right currency parameter'));
-					}
-				let updateData = {ingredient_name , brand , price ,currency : currency, quantity , size}
+				let updateData = req.body;
 				let ingredient_id = ingredientResult[0].ingredient_id;
 				let condition = {ingredient_id};
 				IngredientModel.updateQuery(updateData , condition)
 				.then((ingredientResponse) =>{ responses.success(res, ingredientResponse)})
 				.catch((error) => responses.sendError(error.message, res));
 			} else {
-				throw new Error(responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS));
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS)
 			}
 		} ) .catch((error) => responses.sendError(error.message, res));
 
@@ -82,7 +59,6 @@ exports.editIngredient = (req ,res) => {
 };
 exports.deleteIngredient = (req ,res) => {
 	let {ingredient_id} = req.body;
-	let {access_token} = req.headers;
 	let manKeys = ["ingredient_id"];
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
@@ -94,16 +70,16 @@ exports.deleteIngredient = (req ,res) => {
 		    	let condition = {ingredient_id};
 			    IngredientModel.deleteQuery(condition)
 			    .then((ingredientResponse) =>{ 
-				throw new Error(responses.success(res, constant.responseMessages.INGREDIENT_DELETED_SUCCESSFULLY))})
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_DELETED_SUCCESSFULLY)})
 			   .catch((error) => responses.sendError(error.message, res));
 			} else {
-				throw new Error(responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS));
+				responses.invalidCredential(res, constant.responseMessages.INGREDIENT_NOT_EXISTS);
 			}
 		}) .catch((error) => responses.sendError(error.message, res));
 	}) .catch((error) => responses.sendError(error.message, res));
 };
 exports.get_ingredient = (req , res) => {
-	let sql = "select * from `tb_ingredientlist`";
+	let sql = "select `ingredient_name` from `tb_ingredientlist`";
 	connection.query(sql , [] ,function(err , result) {
 		if(err) {
 			responses.sendError(err,res);

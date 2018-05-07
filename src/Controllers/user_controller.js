@@ -45,7 +45,6 @@ exports.signup = (req, res) => {
 		}
 	}).catch((error) => responses.sendError(error.message, res));
 };
-
 exports.login = (req, res) => {
 	let {user_name, password, device_type, device_token, latitude, longitude} = req.body;
 	let manKeys = ["user_name", "password", "device_type", "device_token", "latitude", "longitude"];
@@ -168,7 +167,7 @@ exports.resetPassword = (req , res) => {
 				let user_id = userResult[0].user_id;
 				let condition = {user_id};
 				UserModel.updateQuery(updateData , condition)
-				.then((userResponse) => {responses.success(res ,constant.responseMessages.RESETPASSWORD_SUCCESSFULLY);})
+				.then((userResponse) => {responses.success_otp(res ,{access_token},constant.responseMessages.RESETPASSWORD_SUCCESSFULLY);})
 				.catch((error) => responses.sendError(error.message, res));
 			
 		}).catch((error) => responses.sendError(error.message, res));
@@ -191,7 +190,7 @@ exports.verifyOtp = (req , res) => {
 			 	let user_id = userResult[0].user_id;
 				let condition = {user_id};
 				UserModel.updateQuery(updateData , condition)
-				.then((userResponse) => {responses.success( res ,constant.responseMessages.OTP_VERIFIED);})
+				.then((userResponse) => {responses.success_otp( res ,{access_token},constant.responseMessages.OTP_VERIFIED);})
 				.catch((error) => responses.sendError(error.message, res));
 			}
 		}).catch((error) => responses.sendError(error.message, res));

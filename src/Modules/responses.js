@@ -57,14 +57,22 @@ exports.sendError = (error, res) => {
 
 exports.success = (res, result) => {
 	var response = {
-		"message": result,
-		"response" : {}
+		"message": "",
+		"response" : result,
 	};
 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
 };
 exports.successOtp = (res, result) => {
 	var response = {
 		"message": result,
+		
+	};
+	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+};
+exports.success_otp = (res,{access_token}, result) => {
+	var response = {
+		"message": result,
+		"access_token" : access_token,
 		
 	};
 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
