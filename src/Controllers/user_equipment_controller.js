@@ -94,7 +94,7 @@ exports.deleteEquipment = (req ,res) => {
 		    	let condition = {equipment_id};
 			    EquipmentModel.deleteQuery(condition)
 			    .then((ingredientResponse) =>{ 
-				responses.invalidCredential(res, constant.responseMessages.EQUIPMENT_DELETED_SUCCESSFULLY)})
+				responses.success(res, constant.responseMessages.EQUIPMENT_DELETED_SUCCESSFULLY)})
 			   .catch((error) => responses.sendError(error.message, res));
 			} else {
 				throw new Error(responses.invalidCredential(res, constant.responseMessages.EQUIPMENT_NOT_EXISTS));

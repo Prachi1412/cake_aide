@@ -36,6 +36,7 @@ exports.invalidCredential = function (res, msg) {
 		"response" : {}
 	};
 	res.status(constants.responseFlags.INVALID_CREDENTIAL).json(response);
+	return false;
 };
 
 exports.authenticationErrorResponse =  (res) => {
@@ -73,6 +74,14 @@ exports.success_otp = (res,{access_token}, result) => {
 	var response = {
 		"message": result,
 		"access_token" : access_token,
+		
+	};
+	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+};
+exports.success_recipe = (res,msg, result) => {
+	var response = {
+		"message": msg,
+		"result" : result,
 		
 	};
 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);

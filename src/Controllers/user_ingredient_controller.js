@@ -11,11 +11,14 @@ import md5 from 'md5';
 exports.addIngredient = (req , res) => {
 	let { ingredient_name , brand , price ,currency, quantity ,size } = req.body;
 	let {access_token} = req.headers;
-	let user_id = req.user.user_id;
-	let manKeys = ["ingredient_name" , "brand" , "price" ,"currency" , "quantity" , "size"];
+	//let user_id = req.user.user_id;
+	let manKeys = ["ingredient_name" , "brand" ,"currency"  , "size"];
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
 	.then(result => {
+		UserModel.selectQuery({access_token})
+		.then(userResult => {
+			let user_id = userResult[0].user_id;
 			IngredientModel.selectQuery({ingredient_name})
 			.then(ingredientResult => {
 				if(ingredientResult.length >0) {
@@ -24,7 +27,7 @@ exports.addIngredient = (req , res) => {
 					let ingredient_id = md5(new Date());
 					if(currency == 1) {
 						currency = "£";
-					} else if(currency == 2) {
+					} else if(currency == 2) { 
 						currency = "$";
 					} else if(currency == 3) {
 						currency = "€";
@@ -33,13 +36,17 @@ exports.addIngredient = (req , res) => {
 					} else {
 						throw new Error(responses.invalidCredential(res , 'Plaese enter right currency parameter'));
 					}
+					if(req.body.price <= 0 || req.body.quantity <= 0) {
+						throw new Error(responses.invalidCredential(res , 'Price and Quantity should not be zero'));
+					}
 					let insertData = {user_id ,ingredient_id,ingredient_name , brand , price ,currency : currency , quantity ,size}
 					IngredientModel.insertQuery(insertData).then((ingredientResponse) =>{ responses.success(res, ingredientResponse[0])})
 					.catch((error) => responses.sendError(error.message, res));
 				}
 			}) .catch((error) => responses.sendError(error.message, res));
-
 		}).catch((error) => responses.sendError(error.message, res));
+
+	}).catch((error) => responses.sendError(error.message, res));
 };
 
 exports.editIngredient = (req ,res) => {

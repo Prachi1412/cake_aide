@@ -24,5 +24,7 @@ exports.getRouter = (app) => {
 	app.route("/user/updateProfile").post(auth.requiresLogin,upload.any(), user.updateProfile);
 	app.route("/user/verifyOtp").post(auth.requiresLogin, user.verifyOtp);
 	app.route("/user/logOut").post(auth.requiresLogin,user.logOut);
+	app.route("/user/getUserDetails").get(user.getUserDetails);
+	
 	return app;
 }

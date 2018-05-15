@@ -22,8 +22,9 @@ exports.createRecipeType = (req , res) => {
 			let user_id = userResult[0].user_id;
 			let recipe_id = md5(new Date());
 			let insertData = {user_id ,recipe_id, image ,recipe_type,is_image_uploaded : 1}
-			RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success(res, constant.responseMessages.IMAGE_UPLOADED)})
-			.catch((error) => responses.sendError(error.message, res));
+			RecipeModel.insertQuery(insertData).then((recipeResponse) =>{
+			 responses.success_recipe(res,'image uploaded successfully',recipeResponse[0])
+			}).catch((error) => responses.sendError(error.message, res));
 		    }) .catch((error) => responses.sendError(error.message, res));
 	    }
 	}    
@@ -39,7 +40,7 @@ exports.createRecipeType = (req , res) => {
 				let user_id = userResult[0].user_id;
 				let recipe_id = md5(new Date());
 				let insertData = {user_id ,recipe_id ,paste_recipe ,is_recipe_pasted:1, recipe_type : 2}
-				RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success(res, constant.responseMessages.RECIPE_UPLOADED)})
+				RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success_recipe(res,"Recipe Pasted successfully",recipeResponse[0])})
 				.catch((error) => responses.sendError(error.message, res));
 		    }).catch((error) => responses.sendError(error.message, res));
 		}).catch((error) => responses.sendError(error.message, res));
@@ -56,7 +57,7 @@ exports.createRecipeType = (req , res) => {
 				let user_id = userResult[0].user_id;
 				let recipe_id = md5(new Date());
 				let insertData = {user_id , recipe_id,amount , recipe_type : 3 ,is_manual :1}
-				RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success(res, constant.responseMessages.MANUAL_ENTRY_LIST)})
+				RecipeModel.insertQuery(insertData).then((recipeResponse) =>{ responses.success_recipe(res,'Recipe Added Manually', recipeResponse[0])})
 				.catch((error) => responses.sendError(error.message, res));
 			}).catch((error) => responses.sendError(error.message, res));
 		}).catch((error) => responses.sendError(error.message, res));
@@ -79,6 +80,57 @@ exports.newRecipeEntry = (req , res) => {
 		.catch((error) => responses.sendError(error.message, res));
 	}).catch((error) => responses.sendError(error.message, res));
 }
+
+exports.recipe_delete = (req , res) => {
+	let {recipe_id} = req.body;
+	let {access_token} = req.headers;
+	let manKeys = ["recipe_id"];
+	commFunc.checkKeyExist(req.body, manKeys)
+	.then((result) => {
+		if(result.length > 0) {
+			responses.parameterMissing(res,result[0]);
+		} else {
+			console.log("comming");
+		RecipeModel.selectQuery({recipe_id})
+		.then((recipeResponse) => {
+			console.log(recipeResponse[0]);
+			if(recipeResponse.length > 0) {
+				//let recipe_id = recipeResponse[0].recipe_id;
+			    RecipeModel.deleteQuery({recipe_id})
+			    .then((recipeResponse) =>{ 
+				responses.success(res, 'Recipe deleted successfully.')
+			})
+			   .catch((error) => responses.sendError(error.message, res));
+			} else {
+				responses.invalidCredential(res, 'Recipe not exist.');
+			}
+		}) .catch((error) => responses.sendError(error.message, res));
+	}
+}) .catch((error) => responses.sendError(error.message, res));
+}
+
+// exports.recipe_delete = (req, res) => {
+// 	let {recipe_id} = req.body;
+// 	let {access_token} = req.headers;
+// 	let manKeys = ["recipe_id"];
+// 	commFunc.checkKeyExist(req.body, manKeys)
+// 	.then((result) => {
+// 		if(result.length > 0) {
+// 			responses.parameterMissing(res, result[0]);
+// 		} else {
+// 			RecipeModel.selectQuery({recipe_id})
+// 			.then((reciperesult) => {
+// 				if(reciperesult == 0) {
+// 					responses.invalidCredential(res, "no recipe");
+// 				} else {
+// 					console.log(reciperesult);
+// 				}
+// 			})
+// 			.catch((error) => responses.sendError(error.message, res));
+// 		}
+// 	})
+// 	.catch((error) => responses.sendError(error.message, res));
+// }
 
 exports.getRecipe = (req , res) => {
 	let sql = "select `recipe_name` from `tb_myrecipe`";

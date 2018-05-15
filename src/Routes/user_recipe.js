@@ -18,5 +18,6 @@ exports.getRouter = (app) => {
 	app.route("/user_recipe/createRecipeType").post(upload.any(),user_recipe.createRecipeType);
 	app.route("/user_recipe/newRecipeEntry").post(user_recipe.newRecipeEntry);
 	app.route("/user_recipe/getRecipe").get(user_recipe.getRecipe);
+	app.route("/user_recipe/recipe_delete").delete(user_recipe.recipe_delete);
 	return app;
 }

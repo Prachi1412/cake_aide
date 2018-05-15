@@ -29,6 +29,21 @@ let updateQuery = (values, condition) => {
 		});
 	});
 };
+let updateQueryUser = (values, condition) => {
+	return new Promise((resolve, reject) => {
+		let sql = "UPDATE `tb_user` SET ? WHERE ?";
+		connection.query(sql, [values, condition], (err, result) => {
+			if (err) {
+				reject(err);
+			} else {
+				let sql = "SELECT * FROM `tb_user` WHERE ?";
+				connection.query(sql, [condition], (err, result) => {
+					err ? reject(err) : resolve(result);
+				});
+			}
+		});
+	});
+};
 
 let sendOtp = (res, mobile_number) => {
 	let sql = "SELECT * FROM `tb_user` WHERE `mobile_number`=?";
@@ -82,6 +97,7 @@ let insertQuery = (values) => {
 export default {
 	selectQuery,
 	updateQuery,
+	updateQueryUser,
 	sendOtp,
 	sendMail,
 	insertQuery

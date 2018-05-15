@@ -2,7 +2,10 @@ import commFunc from '../Modules/commonFunction';
 import responses from '../Modules/responses';
 import constant from '../Modules/constant';
 import AdminModel from '../Modals/admin_model';
+import UserModel from '../Modals/user_model';
 import config from '../Config/nodemailer';
+import IngredientModel from '../Modals/user_ingredient_model';
+import connection from '../Modules/connection.js';
 
 import md5 from 'md5';
 
@@ -32,6 +35,36 @@ exports.login = (req, res) => {
 		}).catch((error) => responses.sendError(error.message, res));
 	}).catch((error) => responses.sendError(error.message, res));
 };
+exports.editProfile = (req , res) => {
+	let { first_name,phone,profile_image } = req.body;
+	let {access_token} = req.headers;
+	let manKeys = ["first_name","phone"];
+	let manValues = { first_name,phone};
+	let condition = {access_token};
+ 	commFunc.checkKeyExist(manValues, manKeys)
+	 		.then(result => result.length ? responses.parameterMissing(res, result[0]) : '' )
+			.then(result => {
+			AdminModel.selectQuery(condition)
+			.then(adminResult => adminResult.length >0 ? adminResult : responses.userNotExist(res))
+			.then(adminResult => {
+				if(phone.length <10){
+					responses.invalidmobilenumber(res);
+				} else {
+				for(let i=0; i< req.files.length ;i++) {
+					let profile_image = `/admin/${req.files[i].filename}`;
+					let updateData = {first_name,phone,profile_image ,is_profile_created : 1};
+					let condition = {access_token};
+					AdminModel.updateQuery(updateData , condition)
+					.then((adminResponse) => {responses.success(res , adminResponse);console.log(adminResponse)})
+					.catch((error) => responses.sendError(error.message, res));
+					}
+				}
+
+			})
+			.catch((error) => responses.sendError(error.message, res));
+		})
+	.catch((error) => responses.sendError(error.message, res));
+}
 exports.forgotPassword = (req , res) => {
 	let {email} = req.body;
 	let manKeys = ["email"];
@@ -105,7 +138,6 @@ exports.resetPassword = (req , res) => {
 	})
 	.catch((error) => responses.sendError(error.message, res));
 };
-
 exports.logOut = (req, res) => {
 	let {access_token} = req.headers;
 	let condition = {access_token};
@@ -122,3 +154,82 @@ exports.logOut = (req, res) => {
 		}) .catch((error) => responses.sendError(error.message, res));
 	}) .catch((error) => responses.sendError(error.message, res));
 }
+exports.block_user = (req, res) => {
+
+	let {user_id, is_blocked} = req.body ; 
+	//let manKeys = ["user_id" , "is_blocked"];
+	let updateData = {is_blocked};
+	let condition = {user_id}; 
+	
+    
+    
+  		UserModel.updateQueryUser (updateData, condition)
+  		.then((userResult) =>{
+  		responses.success(res, userResult)
+  		}).catch((error) => responses.sendError(error.message, res));
+}
+exports.addAdminIngredient = (req , res) => {
+	let { ingredient_name , brand , price ,currency, quantity ,size } = req.body;
+	let {access_token} = req.headers;
+	console.log(access_token)
+	//let user_id = req.user.user_id;
+	let manKeys = ["ingredient_name" , "brand" ,"currency","price","quantity" ,"size"];
+	commFunc.checkKeyExist(req.body, manKeys)
+	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
+	.then(result => {
+		AdminModel.selectQuery({access_token})
+		.then(adminResult => {
+			console.log(adminResult[0]);
+			let admin_id = adminResult[0].admin_id;
+			IngredientModel.selectQuery({ingredient_name})
+			.then(ingredientResult => {
+				if(ingredientResult.length >0) {
+					throw new Error(responses.invalidCredential(res, constant.responseMessages.INGREDIENT_ALREADY_EXISTS));
+				} else {
+					let ingredient_id = md5(new Date());
+					if(currency == "British Pound") {
+						currency = "£";
+					} else if(currency == "US Dollar") { 
+						currency = "$";
+					} else if(currency == "Euro") {
+						currency = "€";
+					} else if(currency == "Japanese Currency") {
+						currency = "¥";
+					} else {
+						throw new Error(responses.invalidCredential(res , 'Plaese enter right currency parameter'));
+					}
+					if(req.body.price <= 0 || req.body.quantity <= 0) {
+						throw new Error(responses.invalidCredential(res , 'Price and Quantity should not be zero'));
+					}
+					let insertData = {admin_id ,ingredient_id,ingredient_name , brand ,currency : currency,  price, quantity ,size}
+					IngredientModel.insertQuery(insertData).then((ingredientResponse) =>{ responses.success(res, ingredientResponse[0])})
+					.catch((error) => responses.sendError(error.message, res));
+				}
+			}) .catch((error) => responses.sendError(error.message, res));
+		}).catch((error) => responses.sendError(error.message, res));
+
+	}).catch((error) => responses.sendError(error.message, res));
+};
+exports.showIngredientName = (req ,res) => {
+	let sql = "select * from `tb_ingredientlist`";
+	connection.query(sql , [] ,function(err , result) {
+		if(err) {
+			responses.sendError(err,res);
+		} else {
+			responses.success(res , result);
+		}
+	})
+}
+exports.adminDeleteIngredient = (req ,res) => {
+	let {ingredient_id} = req.body;
+	let {access_token} = req.headers;
+	let manKeys = ["ingredient_id"];
+	commFunc.checkKeyExist(req.body, manKeys)
+	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
+	.then((result) => {
+		IngredientModel.deleteQuery({ingredient_id})
+		.then((ingredientResponse) =>{ 
+		throw new Error(responses.success(res, constant.responseMessages.INGREDIENT_DELETED_SUCCESSFULLY))})
+		.catch((error) => responses.sendError(error.message, res));
+	}).catch((error) => responses.sendError(error.message, res));
+};

@@ -3,6 +3,8 @@ import responses from '../Modules/responses';
 import constant from '../Modules/constant';
 import UserModel from '../Modals/user_model';
 import config from '../Config/nodemailer.js';
+import connection from '../Modules/connection.js';
+import AdminModel from '../Modals/admin_model';
 
 import md5 from 'md5';
 
@@ -212,9 +214,33 @@ exports.logOut = (req, res) => {
 		}) .catch((error) => responses.sendError(error.message, res));
 	}) .catch((error) => responses.sendError(error.message, res));
 }
+exports.getUserDetails = (req , res) => {
+	let sql = "select * from `tb_user`";
+	connection.query(sql , [] ,function(err , result) {
+		if(err) {
+			responses.sendError(err,res);
+		} else {
+			responses.success(res , result);
+		}
+	})
+}
+exports.block_user = (req, res) => {
 
-
-
+	let {user_id, is_blocked} = req.body ; 
+	let manKeys = ["user_id" , "is_blocked"];
+	let updateData = {is_blocked};
+	let condition = {user_id}; 
+	commFunc.checkKeyExist(req.body, manKeys)
+    .then(result => { if(result.length > 0 ) {
+     responses.parameterMissing(res, result[0])
+     } else {
+  		UserModel.updateQueryUser (updateData, condition)
+  		.then((userResult) =>{
+  		responses.success(res, userResult)
+  		}).catch((error) => responses.sendError(error.message, res));
+	}
+})
+}
 
 
 
