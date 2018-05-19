@@ -21,7 +21,7 @@ let updateQuery = (values, condition) => {
 				reject(err);
 			} else {
 
-				let sql = "SELECT * FROM `tb_myrecipe` WHERE ? ORDER BY `row_id` DESC";
+				let sql = "SELECT * FROM `tb_myrecipe` WHERE ?";
 				connection.query(sql, [condition], (err, result) => {
 					err ? reject(err) : resolve(result);console.log(result)
 				});

@@ -13,6 +13,8 @@ let selectQuery = (values) => {
 	});
 };
 let updateQuery = (values, condition) => {
+	console.log("model "+ values)
+	console.log("model cond" +condition)
 	return new Promise((resolve, reject) => {
 		let sql = "UPDATE `tb_ingredientlist` SET ? WHERE ?";
 		connection.query(sql, [values, condition], (err, result) => {
