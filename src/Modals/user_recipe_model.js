@@ -37,8 +37,8 @@ let insertQuery = (values) => {
 			else {
 				// message.sendOtp
 				// email.sendMail
-				let sql = "SELECT * FROM `tb_myrecipe` ORDER BY `row_id` DESC";
-				connection.query(sql, [], (err, result) => {
+				let sql = "SELECT * FROM `tb_myrecipe` WHERE `recipe_id` = ?";
+				connection.query(sql, [values.recipe_id], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
 			}

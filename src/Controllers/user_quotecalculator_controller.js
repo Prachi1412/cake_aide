@@ -7,9 +7,24 @@ import connection from '../Modules/connection.js';
 import md5 from 'md5';
 
 exports.addQuoteCalculator = (req , res) => {
-	let access_token = req.headers;
-	let user_id = req.user.user_id;
-	let {name , description , amount , enter_time , time_format} = req.body;
+	let {access_token} = req.headers;
+	let {name , description ,recipe_name, enter_time , time_format,margin,equipment_name,price} = req.body;
+	let equipment_list =[];
+	equipment_list = req.body.equipment_list;
+	console.log(Object.values(equipment_list))
+	console.log(equipment_list)
+	UserModel.selectQuery({access_token})
+	.then((result) => {
+		let user_id = result[0].user_id;
+		equipment_list.forEach(function(element) {
+			equipment_name = element.equipment_name;
+			price = element.price;
+			//let array = {equipment_name,price};
+			
+			//console.log(JSON.stringify(element.equipment_list))
+			console.log("array",equipment_list)
+		})
+	}).catch((error) => responses.sendError(error.message, res));
 	let manKeys = ["name","description","amount","enter_time" ,"time_format"];
 	commFunc.checkKeyExist(req.body, manKeys)
 	.then(result => result.length ? new Promise  (new Error(responses.parameterMissing(res,result[0]))) : '')
