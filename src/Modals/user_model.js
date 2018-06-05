@@ -4,11 +4,12 @@ import constant from '../Modules/constant';
 import config from '../Config/nodemailer.js';
 
 let selectQuery = (values) => {
+	console.log("values"+values)
 	return new Promise((resolve, reject) => { 
 		console.log(values)
 		let sql = "SELECT * FROM `tb_user` WHERE ?";
 		connection.query(sql, [values], (err, result) => {
-			err ? reject(err) : resolve(result);
+			err ? reject(err) : resolve(result);//console.log(result)
 		});
 	});
 };
@@ -40,6 +41,19 @@ let updateQueryUser = (values, condition) => {
 				connection.query(sql, [condition], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
+			}
+		});
+	});
+};
+
+let updateQueryemail = (values, condition) => {
+	return new Promise((resolve, reject) => {
+		let sql = "UPDATE `tb_user` SET ? WHERE ?";
+		connection.query(sql, [values, condition], (err, result) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(result);
 			}
 		});
 	});
@@ -93,6 +107,22 @@ let insertQuery = (values) => {
 		});
 	});
 }
+let insertQueryFeedback = (values) => {
+	return new Promise((resolve, reject) => {
+		let sql = "INSERT INTO `tb_user_feedback` SET ?";
+		connection.query(sql, [values], (err, result) => {
+			if (err) {reject(err);}
+			else {
+				// message.sendOtp
+				// email.sendMail
+				let sql = "SELECT * FROM `tb_user_feedback` WHERE user_id=?";
+				connection.query(sql, [values.user_id], (err, result) => {
+					err ? reject(err) : resolve(result);
+				});
+			}
+		});
+	});
+}
 
 export default {
 	selectQuery,
@@ -100,5 +130,7 @@ export default {
 	updateQueryUser,
 	sendOtp,
 	sendMail,
-	insertQuery
+	insertQuery,
+	updateQueryemail,
+	insertQueryFeedback
 }

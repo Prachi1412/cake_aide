@@ -22,6 +22,14 @@ exports.invalidemailformat = (res) => {
 	};
 	res.status(constants.responseFlags.INVALID_EMAIL_ID_FORMAT).json(response);
 };
+exports.success_recipe = (res,msg, result) => {
+	var response = {
+		"message": msg,
+		"result" : result,
+		
+	};
+	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+};
 exports.invalidpasswordformat = (res) => {
 	let response = {
 		"message": constants.responseMessages.INVALID_PASSWORD_FORMAT,
@@ -56,9 +64,25 @@ exports.sendError = (error, res) => {
 	res.status(constants.responseFlags.ERROR_IN_EXECUTION).json(response);
 };
 
-exports.success = (res, result) => {
+// exports.success = (res, result) => {
+// 	var response = {
+// 		"message": "",
+// 		"response" : result,
+// 	};
+// 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+// };
+
+exports.success = (res, result, message = constants.responseMessages.ACTION_COMPLETE) => {
 	var response = {
-		"message": "",
+		message,
+		"response" : result
+	};
+	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);
+};
+
+exports.successemail = (res,msg, result) => {
+	var response = {
+		"message": msg,
 		"response" : result,
 	};
 	res.status(constants.responseFlags.ACTION_COMPLETE).json(response);

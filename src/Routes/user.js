@@ -25,6 +25,10 @@ exports.getRouter = (app) => {
 	app.route("/user/verifyOtp").post(auth.requiresLogin, user.verifyOtp);
 	app.route("/user/logOut").post(auth.requiresLogin,user.logOut);
 	app.route("/user/getUserDetails").get(user.getUserDetails);
+	app.route("/user/change_emailid").post(user.change_emailid);
+	app.route("/user/user_feedback").post(user.user_feedback);
+	app.route("/user/user_callus").get(user.user_callus);
+	app.route("/user/hourlyrate").get(user.hourlyrate);
 	
 	return app;
 }

@@ -23,7 +23,7 @@ let updateQuery = (values, condition) => {
 
 				let sql = "SELECT * FROM `tb_shoppinglist` WHERE ? ORDER BY `row_id` DESC";
 				connection.query(sql, [condition], (err, result) => {
-					err ? reject(err) : resolve(result);
+					err ? reject(err) : resolve(result);console.log(result)
 				});
 			}
 		});
@@ -45,20 +45,6 @@ let insertQuery = (values) => {
 		});
 	});
 }
-let insertlist = (values) => {
-	return new Promise((resolve, reject) => {
-		let sql = "INSERT INTO `tb_addonlist` SET ?";
-		connection.query(sql, [values], (err, result) => {
-			if (err) {reject(err);}
-			else {
-				let sql = "SELECT * FROM `tb_addonlist` WHERE admin_id = ?";
-				connection.query(sql, [values.admin_id], (err, result) => {
-					err ? reject(err) : resolve(result);
-				});
-			}
-		});
-	});
-}
 let deleteQuery = (condition) => {
 	return new Promise((resolve, reject) => {
 		let sql = "DELETE FROM `tb_shoppinglist` WHERE ?";
@@ -71,6 +57,5 @@ export default {
 	selectQuery,
 	updateQuery,
 	insertQuery,
-	deleteQuery,
-	insertlist
+	deleteQuery
 }

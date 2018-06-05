@@ -57,7 +57,11 @@ define(exports.responseMessages, 'MANUAL_ENTRY_LIST',                     'Manua
 define(exports.responseMessages, 'NAME_ALREADY_EXISTS',                   'This name already Exist');
 define(exports.responseMessages, 'OTP_VERIFIED',                           'Otp verified : 1');
 define(exports.responseMessages, 'QUOTECALCULATOR_NOT_EXISTS',             'Quote Calculator not Exist');
+define(exports.responseMessages, 'REMINDER_NOT_EXISTS',                    'This Reminder not Exist');
 define(exports.responseMessages, 'QUOTECALCULATOR_DELETED_SUCCESSFULLY',   'Quote Calculator deleted successfully.');
+define(exports.responseMessages, 'REMINDER_DELETED_SUCCESSFULLY',          'This Reminder deleted successfully.');
+define(exports.responseMessages, 'REMINDER_ALREADY_EXISTS',                'This reminder already Exist');
+define(exports.responseMessages, 'RECIPE_DELETED_SUCCESSFULLY',            'Recipe deleted successfully.');
 //FOR FLAGS
 define(exports.responseFlags, 'ALREADY_EXIST',                       422);
 define(exports.responseFlags, 'PARAMETER_MISSING',                   422);
@@ -97,7 +101,11 @@ define(exports.responseFlags, 'MANUAL_ENTRY_LIST',                   200);
 define(exports.responseFlags, 'NAME_ALREADY_EXISTS',                 403);
 define(exports.responseFlags, 'OTP_VERIFIED',                        200);
 define(exports.responseFlags, 'QUOTECALCULATOR_NOT_EXISTS',          403);
-define(exports.responseFlags, 'QUOTECALCULATOR_DELETED_SUCCESSFULLY', 200);
+define(exports.responseFlags, 'REMINDER_NOT_EXISTS',                 403);
+define(exports.responseFlags, 'QUOTECALCULATOR_DELETED_SUCCESSFULLY',200);
+define(exports.responseFlags, 'REMINDER_ALREADY_EXISTS',             403);
+define(exports.responseFlags, 'REMINDER_DELETED_SUCCESSFULLY',       200);
+define(exports.responseFlags, 'RECIPE_DELETED_SUCCESSFULLY',         200);
 
 
 

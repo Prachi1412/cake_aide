@@ -9,12 +9,12 @@ var db_config = {
 
 const connection = mysql.createConnection(db_config);
 
-connection.connect( (err) => { 
-	if( err ) {
-		console.log('error when connecting to db:', err); 
-	} else { 
-		console.log("connection variable created "); 
-	}
-});
+// connection.connect( (err) => { 
+// 	if( err ) {
+// 		console.log('error when connecting to db:', err); 
+// 	} else { 
+// 		console.log("connection variable created "); 
+// 	}
+// });
 
 module.exports = connection;

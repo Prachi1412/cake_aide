@@ -29,6 +29,15 @@ let updateQuery = (values, condition) => {
 		});
 	});
 };
+let selectIngredientQuery = (values) => {
+	return new Promise((resolve, reject) => { 
+		console.log(values)
+		let sql = "SELECT * FROM `tb_ingredientlist` WHERE ingredient_name=? AND brand=?";
+		connection.query(sql, [values.ingredient_name, values.brand], (err, result) => {
+			err ? reject(err) : resolve(result);
+		});
+	});
+};
 let insertQuery = (values) => {
 	return new Promise((resolve, reject) => {
 		let sql = "INSERT INTO `tb_ingredientlist` SET ?";
@@ -57,5 +66,6 @@ export default {
 	selectQuery,
 	updateQuery,
 	insertQuery,
-	deleteQuery
+	deleteQuery,
+	selectIngredientQuery
 }

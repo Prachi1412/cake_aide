@@ -25,7 +25,12 @@ exports.getRouter = (app) => {
 	app.route("/admin/block_user").put(admin.block_user);
 	app.route("/admin/addAdminIngredient").post(admin.addAdminIngredient);
 	app.route("/admin/showIngredientName").get(admin.showIngredientName);
-	app.route("/admin/adminDeleteIngredient").post(admin.adminDeleteIngredient);
+	app.route("/admin/showequipmentName").get(admin.showequipmentName);
+	app.route("/admin/adminDeleteIngredient/:ingredient_id").delete(admin.adminDeleteIngredient);
+	app.route("/admin/addAdminEquipment").post(admin.addAdminEquipment);
+	app.route("/admin/adminDeleteEquipment/:equipment_id").delete(admin.adminDeleteEquipment);
+	app.route("/admin/showrecipeDetails").get(admin.showrecipeDetails);
+	app.route("/admin/adminDeleteRecipe/:recipe_id").delete(admin.adminDeleteRecipe);
 ;
 	return app;
 }

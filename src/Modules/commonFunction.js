@@ -40,3 +40,15 @@ exports.checkKeyExist = (req, arr) => {
 		});
 	}); 
 };
+
+exports.checkValueExist = (arr, key) => {
+
+	for (var i = 0; i<arr.length; i++) {
+		if (arr[i].ingredient_id == key) {
+			return 1;
+            break;
+		}
+	}
+
+	return 0;
+};

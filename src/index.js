@@ -12,6 +12,7 @@ process.env.NODE_ENV = environment.configuration;
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../src/uploads')));
+app.use(express.static(path.join(__dirname, '../src/HTML')));
 app.use(cors());
 
 let initRoutes = () => {

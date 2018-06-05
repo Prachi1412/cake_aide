@@ -5,13 +5,11 @@ import RecipeModel from '../Modals/user_recipe_model';
 import UserModel from '../Modals/user_model';
 import IngredientModel from '../Modals/user_ingredient_model';
 import connection from '../Modules/connection.js';
-import convert from 'node-unit-conversion';
 import convertUnit from 'convert-units';
 import async from 'async';
 
-
 import _ from "lodash";
-import md5 from 'md5';	
+import md5 from 'md5';
 
 exports.createRecipeType = (req, res) => {
     let { access_token } = req.headers;
@@ -142,7 +140,25 @@ exports.recipe_delete = (req, res) => {
             }
         }).catch((error) => responses.sendError(error.message, res));
 }
+// exports.getRecipe = (req, res) => {
+//     let { user_id, recipe_name, cake_size, image } = req.body;
+//     let sql = "select * from `tb_myrecipe` where `user_id` = ?";
+//     connection.query(sql, [user_id], function(err, result) {
+//         if (err) {
+//             responses.sendError(err, res);
+//         } else {
+//             if((result[0].recipe_name != '') && (result[0].ingredient_list != '')){
+            
+//                     let data = result.map(element => _.merge(element, { ingredient_list: JSON.parse(element.ingredient_list) }))
+//                     responses.success(res, data);
 
+//                 } else {
+//                     console.log("ingredient list blank");
+//                 }
+//             }
+          
+//         })
+//     }
 exports.getRecipe = (req , res) => {
     let {user_id,recipe_name,cake_size,image} = req.body;
     let sql = "select * from `tb_myrecipe` where `user_id` = ? and recipe_name IS NOT NULL";
@@ -150,13 +166,8 @@ exports.getRecipe = (req , res) => {
         if(err) {
             responses.sendError(err,res);
         } else {
-            let arr =[];
-            let data = result.map(element=>{
-                if(element.ingredient_list ){
-                arr.push(_.merge(element,{ingredient_list :JSON.parse(element.ingredient_list)}))    
-            }                
-            })
-                responses.success(res,arr);
+            let data = result.map(element=>_.merge(element,{ingredient_list :JSON.parse(element.ingredient_list)}))
+                responses.success(res,data);
         }       
     })
 }
@@ -172,7 +183,6 @@ exports.delete_recipe_ingredient = (req, res) => {
             } else {
                 RecipeModel.selectQuery({ recipe_id })
                     .then((recipeResult) => {
-                        if(recipeResult&& recipeResult.length){
                         let ingredient_list = JSON.parse(recipeResult[0].ingredient_list);
                         let checkValue = commFunc.checkValueExist(ingredient_list, ingredient_id);
                         if (checkValue == 0) {
@@ -182,25 +192,32 @@ exports.delete_recipe_ingredient = (req, res) => {
                             };
                             res.status(constant.responseFlags.ACTION_COMPLETE).json(response);
                         } else {
-                            let listArr = _.remove(ingredient_list, (e)=> e.ingredient_id !== ingredient_id);
+                            let listArr = ingredient_list.splice({ ingredient_id }, 1);
                             let condition = { recipe_id };
-                            let updateData = { ingredient_list: JSON.stringify(listArr) };
+                            let updateData = { ingredient_list: JSON.stringify(ingredient_list) };
 
                             RecipeModel.updateQuery(updateData, condition)
                                 .then((recipeListResponse) => {
-                                     let response = {
-                                            response: listArr,
+                                    // responses.success(res,(recipeListResponse))
+                                    let list = [];
+                                    async.eachSeries(recipeListResponse, get_recipe_list, (results) => {
+                                        let response = {
+                                            response: list,
                                             message: "Ingredient deleted successfully."
                                         };
                                         res.status(constant.responseFlags.ACTION_COMPLETE).json(response);
+                                        list = [];
+                                    });
+
+                                    function get_recipe_list(item, callback) {
+                                        item.ingredient_list = JSON.parse(item.ingredient_list);
+                                        console.log(item)
+                                        list.push(item);
+                                        callback();
+                                    }
 
                                 }).catch((error) => responses.sendError(error.message, res));
                         }
-                        }else{
-                          res.status(constant.responseFlags.ACTION_COMPLETE).json({response:{},message:"Receipe id is invalid"});  
-                        }
-
-
 
                     }).catch((error) => responses.sendError(error.message, res));
             }
@@ -263,7 +280,6 @@ exports.clickAddRcipe = (req, res) => {
     let { recipe_id } = req.body;
     let { addmoreingredient } = req.body;
     let data = [];
-    console.log(req.body)
     UserModel.selectQuery({ access_token })
         .then(result => {
             if (result == 0) {
@@ -300,12 +316,21 @@ exports.clickAddRcipe = (req, res) => {
                             } else {
                                 
                                 data = ingredient_list.concat(arr);
+                                       
+                                console.log("===============================")
+                                    console.log(data)
+                                console.log('===============================')
                                  let updateData = { ingredient_list: JSON.stringify(data)}
+                                    // console.log("===============================")
+                                    // console.log(updateData)
                                 RecipeModel.updateQuery(updateData, { recipe_id })
                                     .then((recipeResponse) => {
+                                        console.log(recipeResponse[0].recipe_id)
                                         let recipe_id = recipeResponse[0].recipe_id;
                                         let ingredient_list = JSON.parse(recipeResponse[0].ingredient_list);
-                                        responses.success(res, _.merge({ recipe_id,ingredient_list:data} ))
+                                        console.log("+++++++++++++")
+                                        console.log(ingredient_list)
+                                        responses.success(res, _.merge({ recipe_id, ingredient_list }))
                                     }).catch(error => responses.sendError(error.message, res));
                                         
                          

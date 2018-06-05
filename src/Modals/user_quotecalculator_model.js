@@ -36,7 +36,8 @@ let insertQuery = (values) => {
 				// email.sendMail
 				let sql = "SELECT * FROM `tb_quotcalculator` ORDER BY `row_id` DESC";
 				connection.query(sql, [], (err, result) => {
-					err ? reject(err) : resolve(result);
+					let {admin_id, ...output} = result[0];
+					err ? reject(err) : resolve(output);
 				});
 			}
 		});

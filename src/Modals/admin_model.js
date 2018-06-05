@@ -4,10 +4,11 @@ import constant from '../Modules/constant';
 import config from '../Config/nodemailer.js';
 
 let selectQuery = (values) => {
+	console.log(values)
 	return new Promise((resolve, reject) => { 
 		let sql = "SELECT * FROM `tb_admin` WHERE ?";
 		connection.query(sql, [values], (err, result) => {
-			err ? reject(err) : resolve(result);
+			err ? reject(err) : resolve(result); console.log(result)
 		});
 	});
 };

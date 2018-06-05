@@ -5,7 +5,7 @@ import UserModel from '../Modals/user_model';
 import config from '../Config/nodemailer.js';
 import connection from '../Modules/connection.js';
 import AdminModel from '../Modals/admin_model';
-
+import _ from "lodash";
 import md5 from 'md5';
 
 
@@ -79,8 +79,8 @@ exports.login = (req, res) => {
 exports.createProfile = (req , res) => {
 	let { business_name , mobile_number ,address , profile_image } = req.body;
 	let {access_token} = req.headers;
-	let manKeys = ["business_name" , "mobile_number" ,"address"];
-	let manValues = { business_name , mobile_number ,address };
+	let manKeys = ["business_name" , "mobile_number"];
+	let manValues = { business_name , mobile_number};
 	let condition = {access_token};
  	commFunc.checkKeyExist(manValues, manKeys)
 	 		.then(result => result.length ? responses.parameterMissing(res, result[0]) : '' )
@@ -92,16 +92,28 @@ exports.createProfile = (req , res) => {
 				if(mobile_number.length <10){
 					responses.invalidmobilenumber(res);
 				} else {
-				for(let i=0; i< req.files.length ;i++) {
-					let profile_image = `/user/${req.files[i].filename}`;
+					if(req.files.length > 0) {
+						for(let i=0; i< req.files.length ;i++) {
+						let profile_image = `/user/${req.files[i].filename}`;
+						let user_id = userResult[0].user_id;
+						console.log(user_id)
+						let updateData = {business_name , mobile_number ,address , profile_image ,is_profile_create : 1};
+						let condition = {user_id};
+						UserModel.updateQuery(updateData , condition)
+							.then((userResponse) => {responses.success(res , userResponse);})
+							.catch((error) => responses.sendError(error.message, res));
+						}
+					} else {
+
 					let user_id = userResult[0].user_id;
 					console.log(user_id)
-					let updateData = {business_name , mobile_number ,address , profile_image ,is_profile_create : 1};
+					let updateData = {business_name , mobile_number ,address , profile_image ,is_profile_create : 0};
 					let condition = {user_id};
 					UserModel.updateQuery(updateData , condition)
 						.then((userResponse) => {responses.success(res , userResponse);})
 						.catch((error) => responses.sendError(error.message, res));
 					}
+		
 				}
 
 			})
@@ -110,23 +122,30 @@ exports.createProfile = (req , res) => {
 	.catch((error) => responses.sendError(error.message, res));
 };
 exports.updateProfile = (req , res) => {
-	let access_token = req.headers;
-	let user_id = req.user.user_id;
-	let {business_name , mobile_number,address,profile_image} = req.body;
-	console.log(req.files.length)
-        if(req.files.length > 0) {
-        	for(let i=0; i< req.files.length ;i++)
-		    profile_image = `/user/${req.files[i].filename}`;
-	    	let updateData = req.body;
-			UserModel.updateQuery(updateData,{user_id})
-	 		.then((userResponse) => {responses.success(res , userResponse)})
-			.catch((error) => responses.sendError(error.message, res));
-		} else {
-			let updateData = req.body;
-			 	UserModel.updateQuery(updateData,{user_id})
-			 	.then((userResponse) => {responses.success(res , userResponse)})
+	 let {access_token} = req.headers;
+	 let {business_name , mobile_number,address,profile_image} = req.body;
+	 UserModel.selectQuery({access_token})
+	 .then((result) =>{
+	 	console.log("========="+result)
+	 	if(result == 0) {responses.authenticationErrorResponse(res);}
+	 	else {
+	 		let user_id = result[0].user_id;
+	 		console.log(req.files.length)
+	        if(req.files.length > 0) {
+	        	for(let i=0; i< req.files.length ;i++)
+			    profile_image = `/user/${req.files[i].filename}`;
+		    	let updateData = req.body;
+				UserModel.updateQuery(updateData,{user_id})
+		 		.then((userResponse) => {responses.success(res , userResponse)})
 				.catch((error) => responses.sendError(error.message, res));
-		}
+				} else {
+				let updateData = req.body;
+				 	UserModel.updateQuery(updateData,{user_id})
+				 	.then((userResponse) => {responses.success(res , userResponse)})
+					.catch((error) => responses.sendError(error.message, res));
+				}
+ 			}
+		}).catch((error) => responses.sendError(error.message, res));
 }
 
 exports.forgotPassword = (req , res) => {
@@ -238,8 +257,96 @@ exports.block_user = (req, res) => {
   		.then((userResult) =>{
   		responses.success(res, userResult)
   		}).catch((error) => responses.sendError(error.message, res));
-	}
-})
+	   }
+    })
+}
+exports.change_emailid = (req, res) => {
+
+	let {email_id,new_email_id} = req.body ; 
+	let {access_token} = req.headers;
+	let manKeys = ["email_id","new_email_id"];
+	let condition = {access_token}; 
+	commFunc.checkKeyExist(req.body, manKeys)
+    .then(result => { if(result.length > 0 ) {
+     responses.parameterMissing(res, result[0])
+     } else {
+  		UserModel.selectQuery({access_token})
+  		.then((userResult)=>{
+  			if(userResult == 0) {
+  				responses.authenticationErrorResponse(res);
+  			} else {
+  				UserModel.selectQuery({email_id})
+  				.then((userResponse) => {
+  					if(userResponse == 0) {
+  						responses.invalidCredential(res,"Email not found.");
+  					} else {
+  						UserModel.updateQueryemail({email_id : new_email_id},{email_id})
+  						.then((updateData) =>{
+  							let message = "Email update successfully."
+  								responses.successemail(res,message, _.merge({new_email_id}));
+  							
+  						})
+  						.catch((error) => responses.sendError(error.message, res));
+  					}
+  				})
+  				.catch((error) => responses.sendError(error.message, res));
+  			}
+  		})
+  		.catch((error) => responses.sendError(error.message, res));
+	   }
+    })
+    .catch((error) => responses.sendError(error.message, res));
+}
+exports.user_feedback = (req ,res) => {
+	console.log("commining")
+	let {access_token} = req.headers;
+	console.log(access_token)
+	let {Feedback} = req.body;
+	UserModel.selectQuery({access_token})
+	.then((userResult)=>{
+		if(userResult == 0) {
+			responses.authenticationErrorResponse(res);
+		} else {
+			let user_id = userResult[0].user_id;
+			let insertData = {user_id,Feedback};
+			UserModel.insertQueryFeedback(insertData).then((response) => {
+				responses.success(res,response);
+				//response.success_recipe(res,"Your Feedback is submitted successfully. Thank you.")
+			})
+			.catch((error) => responses.sendError(error.message, res));
+		}
+
+	}).catch((error) => responses.sendError(error.message, res));
+}
+exports.user_callus = (req , res) => {
+	let sql = "SELECT `phone` from `tb_admin`";
+	connection.query(sql ,[],(err,result) =>{
+		if(err){responses.sendError(res);}
+		else{
+			responses.success(res,result[0]);
+		}
+	})
+}
+exports.hourlyrate = (req,res) => {
+	let {access_token} = req.headers;
+	let {hourly_rate} = req.body;
+	UserModel.selectQuery({access_token})
+	.then((userResult)=>{
+		if(userResult == 0) {
+			responses.authenticationErrorResponse(res);
+		} else {
+			let user_id = userResult[0].user_id;
+			console.log(user_id)
+			let condition = {user_id};
+			console.log("user_id");
+			let updateData = {hourly_rate};
+			UserModel.updateQuery(updateData,condition)
+			.then((userResult) => {
+				console.log(userResult);
+				responses.success_recipe(res,"Hourly rate is added.");
+			}).catch((error) => responses.sendError(error.message, res));
+		}
+	}).catch((error) => responses.sendError(error.message, res));
 }
 
 

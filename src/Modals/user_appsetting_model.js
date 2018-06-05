@@ -1,12 +1,10 @@
 import connection from '../Modules/connection.js';
 import responses from '../Modules/responses';
 import constant from '../Modules/constant';
-//import config from '../Config/nodemailer.js';
-
 let selectQuery = (values) => {
 	return new Promise((resolve, reject) => { 
 		console.log(values)
-		let sql = "SELECT * FROM `tb_shoppinglist` WHERE ?";
+		let sql = "SELECT * FROM `tb_reminder` WHERE ?";
 		connection.query(sql, [values], (err, result) => {
 			err ? reject(err) : resolve(result);
 		});
@@ -15,15 +13,15 @@ let selectQuery = (values) => {
 let updateQuery = (values, condition) => {
 
 	return new Promise((resolve, reject) => {
-		let sql = "UPDATE `tb_shoppinglist` SET ? WHERE ?";
+		let sql = "UPDATE `tb_reminder` SET ? WHERE ?";
 		connection.query(sql, [values, condition], (err, result) => {
 			if (err) {
 				reject(err);
 			} else {
 
-				let sql = "SELECT * FROM `tb_shoppinglist` WHERE ? ORDER BY `row_id` DESC";
+				let sql = "SELECT * FROM `tb_reminder` WHERE ?";
 				connection.query(sql, [condition], (err, result) => {
-					err ? reject(err) : resolve(result);
+					err ? reject(err) : resolve(result);console.log(result)
 				});
 			}
 		});
@@ -31,28 +29,14 @@ let updateQuery = (values, condition) => {
 };
 let insertQuery = (values) => {
 	return new Promise((resolve, reject) => {
-		let sql = "INSERT INTO `tb_shoppinglist` SET ?";
+		let sql = "INSERT INTO `tb_reminder` SET ?";
 		connection.query(sql, [values], (err, result) => {
 			if (err) {reject(err);}
 			else {
 				// message.sendOtp
 				// email.sendMail
-				let sql = "SELECT * FROM `tb_shoppinglist` WHERE list_id = ?";
-				connection.query(sql, [values.list_id], (err, result) => {
-					err ? reject(err) : resolve(result);
-				});
-			}
-		});
-	});
-}
-let insertlist = (values) => {
-	return new Promise((resolve, reject) => {
-		let sql = "INSERT INTO `tb_addonlist` SET ?";
-		connection.query(sql, [values], (err, result) => {
-			if (err) {reject(err);}
-			else {
-				let sql = "SELECT * FROM `tb_addonlist` WHERE admin_id = ?";
-				connection.query(sql, [values.admin_id], (err, result) => {
+				let sql = "SELECT * FROM `tb_reminder` where name = ?";
+				connection.query(sql, [values.name], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
 			}
@@ -61,7 +45,7 @@ let insertlist = (values) => {
 }
 let deleteQuery = (condition) => {
 	return new Promise((resolve, reject) => {
-		let sql = "DELETE FROM `tb_shoppinglist` WHERE ?";
+		let sql = "DELETE FROM `tb_reminder` WHERE ?";
 		connection.query(sql,[condition],(err ,result) => {
 			err ? reject(err) : resolve(result);
 		})
@@ -71,6 +55,5 @@ export default {
 	selectQuery,
 	updateQuery,
 	insertQuery,
-	deleteQuery,
-	insertlist
+	deleteQuery
 }

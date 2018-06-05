@@ -1,5 +1,4 @@
 import user_recipe from '../Controllers/user_recipe_controller';
-import auth from '../modules/auth';
 import multer from 'multer';
 import md5 from 'md5';
 import express from 'express'
@@ -16,11 +15,9 @@ exports.getRouter = (app) => {
 });
 	let upload = multer({storage:storage});
 	app.route("/user_recipe/createRecipeType").post(upload.any(),user_recipe.createRecipeType);
+	app.route("/user_recipe/ingredientEntry").post(user_recipe.ingredientEntry);
 	app.route("/user_recipe/recipeEntry").put(user_recipe.recipeEntry);
 	app.route("/user_recipe/getRecipe").post(user_recipe.getRecipe);
 	app.route("/user_recipe/recipe_delete").delete(user_recipe.recipe_delete);
-	app.route("/user_recipe/delete_recipe_ingredient").delete(user_recipe.delete_recipe_ingredient);
-	app.route("/user_recipe/updateRecipeIngredient").put(user_recipe.updateRecipeIngredient);
-	app.route("/user_recipe/clickAddRcipe").put(user_recipe.clickAddRcipe);
 	return app;
 }
