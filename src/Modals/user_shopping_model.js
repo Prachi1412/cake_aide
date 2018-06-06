@@ -13,18 +13,20 @@ let selectQuery = (values) => {
 	});
 };
 let updateQuery = (values, condition) => {
-
 	return new Promise((resolve, reject) => {
 		let sql = "UPDATE `tb_shoppinglist` SET ? WHERE ?";
 		connection.query(sql, [values, condition], (err, result) => {
 			if (err) {
 				reject(err);
 			} else {
+				 console.log("=====================")
+					console.log(condition)
 
-				let sql = "SELECT * FROM `tb_shoppinglist` WHERE ? ORDER BY `row_id` DESC";
-				connection.query(sql, [condition], (err, result) => {
+					let sql = "SELECT * FROM `tb_shoppinglist` WHERE ?";
+					connection.query(sql, [condition], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
+				//resolve(result);
 			}
 		});
 	});
@@ -38,10 +40,10 @@ let insertQuery = (values) => {
 				// message.sendOtp
 				// email.sendMail
 				let sql = "SELECT * FROM `tb_shoppinglist` WHERE list_id = ?";
-				connection.query(sql, [values.list_id], (err, result) => {
+			connection.query(sql, [values.list_id], (err, result) => {
 					err ? reject(err) : resolve(result);
 				});
-			}
+				}
 		});
 	});
 }

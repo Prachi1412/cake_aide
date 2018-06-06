@@ -1,0 +1,12 @@
+{
+	"projectName": "cake_aide",
+	"base_url": "http://localhost:3017/",
+	"mailCredential": {
+		"host": "smtp.sendgrid.net",
+        "port": 25,
+        "auth": {
+            "user": "apikey",
+            
+        }
+	}
+}

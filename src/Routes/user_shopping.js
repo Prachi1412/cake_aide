@@ -9,7 +9,7 @@ exports.getRouter = (app) => {
 	app.route("/user_shopping/editList").put(user_shopping.editList);
 	app.route("/user_shopping/deleteList").delete(user_shopping.deleteList);
 	app.route("/user_shopping/getList").get(user_shopping.getList);
-	app.route("/user_shopping/addonlist").post(user_shopping.addonlist);
+	app.route("/user_shopping/checkIngredient").put(user_shopping.checkIngredient);
 	app.route("/user_shopping/getaddonlist").get(user_shopping.getaddonlist);
 	return app;
 }
